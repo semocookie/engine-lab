@@ -1,0 +1,24 @@
+# build
+build/
+out/
+bin/
+*.exe
+*.pdb
+*.ilk
+*.obj
+
+# IDE
+.vs/
+.vscode/
+CMakeUserPresets.json
+CMakeSettings.json
+
+# OS
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# ── 비공개 ─────────────────────────────────────────────
+# 개인 메모는 저장소에 올리지 않는다. (별도 폴더에서 관리)
+_private/
+99-interview/
