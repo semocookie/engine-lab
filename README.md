@@ -43,22 +43,46 @@ GC를 발표만 하지 않고 만들어 보고, NavMesh를 쓰기만 하지 않�
 
 ---
 
-## 빌드
+## 빌드 — Visual Studio
 
-VS 2026 Community 기준. 별도 설치 없이 됩니다.
+**`generate-solution.bat` 더블클릭** → `build/engine_lab.slnx` 가 생성되고 VS 로 열립니다.
+언리얼의 *Generate Visual Studio project files* 와 같은 역할입니다.
 
-```bash
-cmake -B build
-cmake --build build --config Release
-./build/bin/Release/object_layout.exe
-```
+열린 뒤 두 가지만:
 
-새 주제를 시작할 때는 폴더를 만들고 `main.cpp`만 넣으면 CMake가 자동으로 타깃을 잡습니다.
+1. `object_layout` 우클릭 → **시작 프로젝트로 설정**
+   (CMake 가 만든 솔루션은 기본이 `ALL_BUILD` 라 실행이 안 됩니다)
+2. **`Ctrl+F5`** 로 실행 — `F5` 는 콘솔이 결과를 찍고 바로 닫힙니다
+
+이후로는 `main.cpp` 고치고 `Ctrl+F5` 반복.
+
+### 솔루션을 다시 만들어야 할 때
+
+- 처음 clone 했을 때
+- `build/` 를 지웠을 때
+- **새 주제 폴더(`main.cpp`)를 추가했을 때**
+
+→ `generate-solution.bat` 를 다시 실행하면 됩니다.
+
+`CMakeLists.txt` 가 소스이고 `build/` 안의 `.slnx` · `.vcxproj` 는 **생성물**입니다.
+그래서 `build/` 는 `.gitignore` 에 있습니다.
+
+### 새 주제 시작
 
 ```bash
 cp -r _template 00-cpp/02-lifetime-ownership
-cmake -B build          # 다시 한 번만
 ```
+
+그다음 `generate-solution.bat` 실행. `main.cpp` 가 있으면 CMake 가 타깃을 자동으로 잡습니다.
+
+### 명령줄로 빌드하려면
+
+```bash
+cmake -B build && cmake --build build --config Release && ./build/bin/Release/object_layout.exe
+```
+
+`cmake` 가 PATH 에 없다면 VS 에 번들된 것을 쓰면 됩니다:
+`<VS설치경로>\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe`
 
 ---
 
