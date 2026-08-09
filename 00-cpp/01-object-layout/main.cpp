@@ -28,10 +28,10 @@ struct BadOrder {
 //           sizeof 를 최소로 만들어라.
 //           힌트: 정렬 요구가 큰 것부터.
 struct GoodOrder {
-    char   a;
     double b;
-    char   c;
     int    d;
+    char   a;
+    char   c;
 };
 
 // ─────────────────────────────────────────────────────────────

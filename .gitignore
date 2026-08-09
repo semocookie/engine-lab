@@ -1,5 +1,6 @@
 # build
-build/
+# build32/ 처럼 아키텍처별 폴더도 함께 무시하려면 build* 로 잡아야 한다.
+build*/
 out/
 bin/
 *.exe
