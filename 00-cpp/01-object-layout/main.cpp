@@ -85,14 +85,14 @@ struct MonsterState {
 
 // TODO 2 ── 위와 같은 멤버로, 순서만 바꿔 크기를 줄여라.
 struct MonsterStateTight {
-    bool     bIsAlive;
+    void* Target;
     double   LastSeenTime;
-    uint8_t  Stance;
-    float    Health;
-    bool     bCrouched;
-    void*    Target;
-    uint8_t  TeamId;
     float    ViewAngle;
+    float    Health;
+    uint8_t  TeamId;
+    uint8_t  Stance;
+    bool     bIsAlive;
+    bool     bCrouched;
 };
 
 
@@ -147,12 +147,12 @@ int main() {
     //   무엇이 출력되는가? 먼저 예측하고, 아래 주석을 풀어 확인하라.
     //   그리고 참조/포인터로 부른 경우와 비교하라.
     //
-    // std::printf("\n  [슬라이싱]\n");
-    // Poly sliced = c;
-    // sliced.speak();
-    // Poly& ref = c;
-    // ref.speak();
-    // lab::hexdump(&sliced, sizeof(Poly), "sliced");
+    std::printf("\n  [슬라이싱]\n");
+    Poly sliced = c;
+    sliced.speak();
+    Poly& ref = c;
+    ref.speak();
+    lab::hexdump(&sliced, sizeof(Poly), "sliced");
 
     // ── 실험 4 : 빈 구조체 ──────────────────────────────────
     lab::section("실험 4 — 빈 구조체");
