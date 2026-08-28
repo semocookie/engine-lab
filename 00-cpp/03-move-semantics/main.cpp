@@ -13,6 +13,7 @@
 
 #include "dump.h"
 #include <string>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -53,6 +54,19 @@ struct Payload {
     // TODO 2 ── TODO 1 에서 만든 이동 생성자에 noexcept 를 붙여라.
     //           실험 6 의 결과가 바뀐다. 왜 바뀌는지가 이 주제의 핵심이다.
 
+    Payload(Payload&& Other) noexcept
+        : Data(std::move(Other.Data)), Id(Other.Id)
+    {
+        ++g_Move;
+    }
+
+    Payload& operator=(Payload&& Other) noexcept {
+        Data = std::move(Other.Data);
+        Id = Other.Id;
+		++g_Move;
+        return *this;
+    }
+
     ~Payload() = default;
 };
 
@@ -64,9 +78,23 @@ static void TakeByConstRef(const Payload& p) { (void)p; }
 
 // ─────────────────────────────────────────────────────────────
 //  실험 3 : 반환할 때
+//
+//  식(expression)은 셋 중 하나다. 반환하는 식이 어느 쪽이냐가 결과를 가른다.
+//    lvalue  — 가리키는 객체가 있다.        훔쳐가면 안 된다
+//    xvalue  — 가리키는 객체가 있다.        곧 사라지니 훔쳐가도 된다
+//    prvalue — 가리킬 객체가 아직 없다.     "이런 값을 만들라"는 식일 뿐
 // ─────────────────────────────────────────────────────────────
-static Payload MakePrvalue() { return Payload(1); }        // 이름 없는 임시를 반환
-static Payload MakeNamed()   { Payload p(2); return p; }   // 이름 있는 지역을 반환
+template <class T>
+static constexpr const char* ValCat() {
+    if constexpr (std::is_lvalue_reference_v<T>)      { return "lvalue   (신원 O, 이동 X)"; }
+    else if constexpr (std::is_rvalue_reference_v<T>) { return "xvalue   (신원 O, 이동 O)"; }
+    else                                              { return "prvalue  (신원 X, 이동 O)"; }
+}
+#define VALCAT(e) std::printf("      %-24s %s\n", #e, ValCat<decltype((e))>())
+
+static Payload MakePrvalue() { return Payload(1); }              // 이름 없는 임시를 반환
+static Payload MakeNamed()   { Payload p(2); return p; }         // 이름 있는 지역을 반환
+static Payload MakeMoved()   { Payload p(3); return std::move(p); }  // 굳이 move 를 붙여 반환
 
 // ─────────────────────────────────────────────────────────────
 //  실험 4 : auto 가 만드는 복사
@@ -127,10 +155,20 @@ int main() {
 
     // ── 실험 3 ──────────────────────────────────────────────
     lab::section("실험 3 — 반환할 때는 몇 번 복사되는가");
+    std::printf("  먼저 반환하는 식이 어느 값 범주인지 본다.\n\n");
     {
-        Reset(); Payload x = MakePrvalue(); (void)x; Report("return Payload(1);   이름 없는 임시");
-        Reset(); Payload y = MakeNamed();   (void)y; Report("Payload p; return p; 이름 있는 지역");
+        Payload p(0);
+        VALCAT(Payload(1));
+        VALCAT(p);
+        VALCAT(std::move(p));
+    }
+    std::printf("\n  이제 각각을 반환해본다.\n\n");
+    {
+        Reset(); Payload x = MakePrvalue(); (void)x; Report("return Payload(1);       prvalue");
+        Reset(); Payload y = MakeNamed();   (void)y; Report("Payload p; return p;     lvalue");
+        Reset(); Payload z = MakeMoved();   (void)z; Report("return std::move(p);     xvalue");
         std::printf("\n  -> 값으로 반환하면 무조건 복사가 난다고 알고 있었다면 여기서 갈린다.\n");
+        std::printf("  -> 셋 중 하나만 결과가 다르다. 값 범주 표와 대조해볼 것.\n");
     }
 
     // ── 실험 4 ──────────────────────────────────────────────
@@ -159,7 +197,7 @@ int main() {
         // TODO 3 ── 아래 캡처를 이동 캡처로 바꿔라.   [b = std::move(b)]
         //           복사가 이동으로 바뀌는 것을 확인한다.
         Payload b(2);
-        Reset(); auto L3 = [b] { return b.Id; };   Report("[b]  (TODO 3 대상)");
+        Reset(); auto L3 = [b = std::move(b)] { return b.Id; };   Report("[b]  (TODO 3 대상)");
 
         std::putchar('\n');
         LAYOUT(decltype(L1));
