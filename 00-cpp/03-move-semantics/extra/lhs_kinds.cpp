@@ -1,3 +1,4 @@
+#include "dump.h"   // 콘솔 UTF-8 설정을 겸한다
 #include <string>
 #include <utility>
 

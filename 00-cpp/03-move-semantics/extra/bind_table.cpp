@@ -1,3 +1,4 @@
+#include "dump.h"   // 콘솔 UTF-8 설정을 겸한다
 #include <cstdio>
 #include <string>
 #include <type_traits>
@@ -31,7 +32,7 @@ using Fcrr = decltype(&g_crref);
         std::is_invocable_v<Fcrr, ARG> ? "O" : "X")
 
 int main() {
-    std::printf("\n  인자 \ 매개변수              T&   const T&   T&&   const T&&\n");
+    std::printf("\n  인자 \\ 매개변수              T&   const T&   T&&   const T&&\n");
     std::printf("  ---------------------------------------------------------------\n");
     ROW("Payload a;        (a)",        Payload&);
     ROW("const Payload ca; (ca)",       const Payload&);
