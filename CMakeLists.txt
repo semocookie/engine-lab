@@ -38,7 +38,7 @@ endforeach()
 
 # ─────────────────────────────────────────────────────────
 # <카테고리>/<주제>/extra/*.cpp — 곁가지 측정.
-# 본 실험(main.cpp)과 달리 파일 하나가 곳 실행 파일 하나다.
+# 본 실험(main.cpp)과 달리 파일 하나가 곧 실행 파일 하나다.
 #   00-cpp/03-move-semantics/extra/bind_table.cpp
 #     ->  타깃 이름 move_semantics_bind_table
 #     ->  솔루션 폴더 extra/move_semantics
@@ -62,3 +62,17 @@ foreach(SRC ${LAB_EXTRAS})
 
     message(STATUS "extra target: ${TARGET_NAME}  <-  ${TOPIC_NAME}/extra")
 endforeach()
+
+# ─────────────────────────────────────────────────────────
+# 예외 하나: RTTI 를 끈 채(/GR-)로 한 번 더 빌드한다.
+#   위 규칙이 만든 object_layout_rtti_switch      는 RTTI 켬 (기본값)
+#   아래            object_layout_rtti_switch_off  는 RTTI 끔
+#   두 출력을 나란히 놓고 비교한다.
+# ─────────────────────────────────────────────────────────
+if(MSVC)
+    set(RTTI_SWITCH_SRC ${CMAKE_SOURCE_DIR}/00-cpp/01-object-layout/extra/rtti_switch.cpp)
+    add_executable(object_layout_rtti_switch_off ${RTTI_SWITCH_SRC})
+    target_include_directories(object_layout_rtti_switch_off PRIVATE ${CMAKE_SOURCE_DIR}/tools)
+    target_compile_options(object_layout_rtti_switch_off PRIVATE /GR-)
+    set_target_properties(object_layout_rtti_switch_off PROPERTIES FOLDER "extra/object_layout")
+endif()
