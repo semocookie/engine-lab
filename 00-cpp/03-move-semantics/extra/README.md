@@ -22,10 +22,10 @@
 **Visual Studio** — `generate-solution.bat` 을 다시 돌리면 솔루션의 `extra/move_semantics` 폴더에 타깃이 생긴다.
 시작 프로젝트로 지정하고 `Ctrl+F5`.
 
-**명령줄**
+**명령줄** (이 폴더에서)
 
 ```
-cl /nologo /EHsc /O2 /W4 /std:c++20 /utf-8 <파일>.cpp
+cl /nologo /EHsc /O2 /W4 /std:c++20 /utf-8 /I ..\..\..\tools <파일>.cpp
 ```
 
 ## 주의
