@@ -16,6 +16,7 @@
 | [named_rref.cpp](named_rref.cpp) | 참조를 만드는 것이 무언가를 옮기는가 | 복사 0 · 이동 0, `&a == &r`. **이름이 붙으면 lvalue** 가 되어 다시 `std::move` 가 필요하다 |
 | [lambda_size3.cpp](lambda_size3.cpp) | 값 · 참조 · 이동 캡처의 `sizeof` | 40 / 8 / **40**. 이동 캡처는 참조가 아니라 값 쪽이다 |
 | [dangling_capture.cpp](dangling_capture.cpp) | 참조 캡처한 람다가 대상보다 오래 살아남으면 | 소멸자는 이미 돌았고, **같은 람다를 두 번 불렀는데 답이 달랐다**(`0x0000` → `0xF7B7`). 크래시는 안 났다 |
+| [lambda_member.cpp](lambda_member.cpp) | 멤버 함수 안의 람다가 멤버 변수를 어떻게 잡는가. `[Hp]` / `[=]` / `[Hp = Hp]` / `[*this]`, 그리고 객체가 먼저 사라지면 | `[Hp]` 는 컴파일 오류(C3480). **`[=]` 는 `this` 하나(8바이트)를 잡아** 원본을 읽는다. 값을 바꾸면 바뀐 값이 보이고, 객체를 지우면 `0xDDDDDDDD`. 복사하려면 `[Hp = Hp]`(4) 나 `[*this]`(24). 전역 변수는 캡처 없이 쓴다 |
 
 ## 빌드
 
@@ -35,3 +36,6 @@ cl /nologo /EHsc /O2 /W4 /std:c++20 /utf-8 /I ..\..\..\tools <파일>.cpp
   구성을 바꿀 때마다 답이 달라지는 것 자체가 이 실험의 결론이기도 하다.
 - `bind_table.cpp` 는 `is_invocable_v` 로 **컴파일 가능 여부를 컴파일 타임에** 찍는다.
 - `lhs_kinds.cpp` 는 실패를 보는 파일이라 해당 줄이 주석으로 막혀 있다. 풀고 빌드하면 오류가 난다.
+- `lambda_member.cpp` 의 3번은 이미 지운 객체를 읽는 미정의 동작이다. Debug(명령줄로는 `/Od /MDd`)에서는
+  디버그 힙이 해제한 칸에 칠하는 `0xDDDDDDDD` 가 보이고, `/O2` 에서는 지우기 전 값 100 이 그대로 나와서 멀쩡해 보인다.
+- `lambda_member.cpp` 의 `[Hp]`(멤버를 이름으로 캡처)는 `/DTRY_NAME` 을 주고 컴파일하면 오류 C3480 을 볼 수 있다.
